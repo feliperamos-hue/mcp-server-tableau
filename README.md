@@ -103,3 +103,7 @@ response = client.create_agent_runtime(
 - [AWS Bedrock AgentCore – Guia de Agente Personalizado](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/getting-started-custom.html)
 - [Strands Agents](https://github.com/strands-agents/sdk-python)
 - [API REST do Tableau](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api.htm)
+
+---
+
+*Nota: Este repositório está em desenvolvimento ativo.*

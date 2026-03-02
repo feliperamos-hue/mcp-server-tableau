@@ -1,41 +1,41 @@
 # mcp-server-tableau
 
-> **This repository is a placeholder.** Real implementation will be added in future iterations.
+> **Este repositório é um marcador (placeholder).** A implementação real será adicionada em iterações futuras.
 
-## Overview
+## Visão Geral
 
-This project will contain a **custom MCP (Model Context Protocol) server for Tableau**, designed to be deployed as an agent runtime on **Amazon Bedrock AgentCore**.
+Este projeto conterá um **servidor MCP (Model Context Protocol) personalizado para o Tableau**, projetado para ser implantado como um runtime de agente no **Amazon Bedrock AgentCore**.
 
-The goal is to expose Tableau capabilities (data sources, workbooks, dashboards, and analytics) as tools consumable by AI agents running on the AWS Bedrock platform.
+O objetivo é expor as capacidades do Tableau (fontes de dados, pastas de trabalho, painéis e análises) como ferramentas consumíveis por agentes de IA executados na plataforma AWS Bedrock.
 
 ---
 
-## Current State
+## Estado Atual
 
-The code in this repository is based on the [AWS Bedrock AgentCore getting started guide for custom agents](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/getting-started-custom.html). It implements the minimum contract required by AgentCore Runtime:
+O código neste repositório é baseado no [guia de introdução do AWS Bedrock AgentCore para agentes personalizados](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/getting-started-custom.html). Ele implementa o contrato mínimo exigido pelo AgentCore Runtime:
 
-| Endpoint | Method | Description |
+| Endpoint | Método | Descrição |
 |---|---|---|
-| `/invocations` | `POST` | Main agent interaction endpoint |
-| `/ping` | `GET` | Health check |
+| `/invocations` | `POST` | Endpoint principal de interação com o agente |
+| `/ping` | `GET` | Verificação de integridade (health check) |
 
-The server is built with **FastAPI** and uses **Strands Agents** as the AI processing engine.
-
----
-
-## Planned Implementation
-
-Future versions of this repository will include Tableau-specific tooling, such as:
-
-- Querying published data sources
-- Listing and filtering workbooks and views
-- Extracting insights from dashboards
-- Triggering extract refreshes
-- Managing Tableau Server / Tableau Cloud resources via the REST API
+O servidor é construído com **FastAPI** e utiliza **Strands Agents** como mecanismo de processamento de IA.
 
 ---
 
-## Architecture
+## Implementação Planejada
+
+Versões futuras deste repositório incluirão ferramentas específicas do Tableau, tais como:
+
+- Consultar fontes de dados publicadas
+- Listar e filtrar pastas de trabalho e exibições (views)
+- Extrair insights de painéis (dashboards)
+- Acionar atualizações de extratos
+- Gerenciar recursos do Tableau Server / Tableau Cloud via API REST
+
+---
+
+## Arquitetura
 
 ```
 AWS Bedrock AgentCore
@@ -45,61 +45,61 @@ AWS Bedrock AgentCore
         │
         ▼
  FastAPI Server (port 8080)
-    ├── POST /invocations  ──► Strands Agent ──► Tableau Tools
+    ├── POST /invocations  ──► Strands Agent ──► Ferramentas do Tableau
     └── GET  /ping
 ```
 
-**Key components:**
+**Componentes principais:**
 
-- **FastAPI** — HTTP server adhering to the AgentCore Runtime contract
-- **Strands Agents** — AI agent framework handling tool orchestration
-- **Docker (ARM64)** — Container image built for `linux/arm64` as required by AgentCore
-- **Amazon ECR** — Container registry for the agent image
-- **Amazon Bedrock AgentCore** — Managed runtime for hosting the agent
+- **FastAPI** — Servidor HTTP aderente ao contrato do AgentCore Runtime
+- **Strands Agents** — Framework de agente de IA que lida com a orquestração de ferramentas
+- **Docker (ARM64)** — Imagem de contêiner construída para `linux/arm64` conforme exigido pelo AgentCore
+- **Amazon ECR** — Registro de contêiner para a imagem do agente
+- **Amazon Bedrock AgentCore** — Runtime gerenciado para hospedar o agente
 
 ---
 
-## Deployment (current placeholder)
+## Implantação (marcador atual)
 
-### Prerequisites
+### Pré-requisitos
 
-- Docker with `buildx` support
-- AWS CLI configured
-- An ECR repository
-- An IAM role with Bedrock AgentCore permissions
+- Docker com suporte a `buildx`
+- AWS CLI configurada
+- Um repositório ECR
+- Uma função (role) IAM com permissões para o Bedrock AgentCore
 
-### Build and push image
+### Construir e enviar a imagem (push)
 
 ```bash
 docker buildx create --use
 docker buildx build --platform linux/arm64 \
-  -t <account-id>.dkr.ecr.<region>.amazonaws.com/mcp-server-tableau:latest \
+  -t <id-da-conta>.dkr.ecr.<regiao>.amazonaws.com/mcp-server-tableau:latest \
   --push .
 ```
 
-### Deploy to AgentCore
+### Implantar no AgentCore
 
 ```python
 import boto3
 
-client = boto3.client('bedrock-agentcore-control', region_name='<region>')
+client = boto3.client('bedrock-agentcore-control', region_name='<regiao>')
 
 response = client.create_agent_runtime(
     agentRuntimeName='mcp-server-tableau',
     agentRuntimeArtifact={
         'containerConfiguration': {
-            'containerUri': '<account-id>.dkr.ecr.<region>.amazonaws.com/mcp-server-tableau:latest'
+            'containerUri': '<id-da-conta>.dkr.ecr.<regiao>.amazonaws.com/mcp-server-tableau:latest'
         }
     },
     networkConfiguration={"networkMode": "PUBLIC"},
-    roleArn='arn:aws:iam::<account-id>:role/AgentRuntimeRole'
+    roleArn='arn:aws:iam::<id-da-conta>:role/AgentRuntimeRole'
 )
 ```
 
 ---
 
-## References
+## Referências
 
-- [AWS Bedrock AgentCore – Custom Agent Guide](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/getting-started-custom.html)
+- [AWS Bedrock AgentCore – Guia de Agente Personalizado](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/getting-started-custom.html)
 - [Strands Agents](https://github.com/strands-agents/sdk-python)
-- [Tableau REST API](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api.htm)
+- [API REST do Tableau](https://help.tableau.com/current/api/rest_api/en-us/REST/rest_api.htm)
